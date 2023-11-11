@@ -287,6 +287,10 @@ app.get("/podcast/:name", async (req, res) => {
 
     const stream = fs.createReadStream(filePath);
     stream.pipe(res);
+    stream.on('error', (error) => {
+  console.error('Error reading the file:', error);
+  res.status(500).json({ error: 'Error reading the file' });
+});
   }
 });
 app.get("/search",async (req,res) => {
