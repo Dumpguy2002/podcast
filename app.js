@@ -200,7 +200,7 @@ app.post("/podcast",upload.single('file'),async (req,res) => {
         v = pd[0].num+1;
       }
     const formData = req.body;
-    const path = "http://localhost:8000/podcast/" + req.file.originalname;
+    const path = "podcast/" + req.file.originalname;
     console.log(req.body);
     console.log(req.body.title);
     const podcast = new podcasts({
@@ -253,8 +253,6 @@ app.get("/podcast/:name", async (req, res) => {
     const stat = await getStat(filePath);
     
     res.writeHead(200, {
-      'Access-Control-Allow-Origin': 'http://localhost:3000',
-      'Access-Control-Allow-Credentials':true,
       'Content-Type': 'audio/mp3',
       'Accept-Ranges': 'bytes',
       'Connection': 'Keep-Alive',
