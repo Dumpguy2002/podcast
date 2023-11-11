@@ -200,7 +200,7 @@ app.post("/podcast",upload.single('file'),async (req,res) => {
         v = pd[0].num+1;
       }
     const formData = req.body;
-    const path = "podcast/" + req.file.originalname;
+    const path = "https://podcast-m2p7silv.b4a.run/podcast/" + req.file.originalname;
     console.log(req.body);
     console.log(req.body.title);
     const podcast = new podcasts({
