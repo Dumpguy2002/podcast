@@ -276,14 +276,7 @@ app.get("/podcast/:name", async (req, res) => {
     stream.pipe(res);
   } else {
     // Normal response without range support
-    res.writeHead(200, {
-      'Content-Type': 'audio/mp3',
-      'Accept-Ranges': 'bytes',
-      'Connection': 'Keep-Alive',
-      'Transfer-Encoding': 'chunked',
-      'Content-Length': stat.size.toString(),
-      'Content-Disposition': `attachment; filename="${name}"`,
-    });
+   
 
     const stream = fs.createReadStream(filePath);
     stream.pipe(res);
