@@ -246,29 +246,49 @@ app.get("/main/:id",async (req,res) => {
 })
 
 app.get("/podcast/:name", async (req, res) => {
-  
-    const name = req.params.name;
-    const filePath = `./uploads/${name}`; // Fix the path to the file
-    
-    const stat = await getStat(filePath);
-    
+  const name = req.params.name;
+  const filePath = `./uploads/${name}`;
+
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ error: 'File not found' });
+  }
+
+  const stat = await fs.promises.stat(filePath);
+
+  // Handle range requests
+  const range = req.headers.range;
+
+  if (range) {
+    const parts = range.replace(/bytes=/, "").split("-");
+    const start = parseInt(parts[0], 10);
+    const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1;
+
+    res.writeHead(206, {
+      'Content-Type': 'audio/mp3',
+      'Accept-Ranges': 'bytes',
+      'Connection': 'Keep-Alive',
+      'Content-Length': (end - start + 1).toString(),
+      'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+      'Content-Disposition': `attachment; filename="${name}"`,
+    });
+
+    const stream = fs.createReadStream(filePath, { start, end });
+    stream.pipe(res);
+  } else {
+    // Normal response without range support
     res.writeHead(200, {
       'Content-Type': 'audio/mp3',
       'Accept-Ranges': 'bytes',
       'Connection': 'Keep-Alive',
-      'Transfer-Encoding': 'chunked', // Fixed typo in Transfer-Encoding
-      'Content-Length': stat.size.toString(), // Convert size to string
+      'Transfer-Encoding': 'chunked',
+      'Content-Length': stat.size.toString(),
+      'Content-Disposition': `attachment; filename="${name}"`,
     });
+
     const stream = fs.createReadStream(filePath);
-    stream.on('error', (error) => {
-      console.error('Error reading the file:', error);
-      res.status(500).json({ error: 'Error reading the file' });
-    });
-
     stream.pipe(res);
-  
-})
-
+  }
+});
 app.get("/search",async (req,res) => {
       console.log(req.query.query);
       const result = await podcasts.find({title: {$regex: req.query.query, $options: 'i'}}).limit(10);
