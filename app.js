@@ -150,7 +150,7 @@ app.get("/admin",async (req,res) => {
         const acc = await users.find({email:email.email});
         console.log(acc);
         
-        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000');
+        res.setHeader('Access-Control-Allow-Origin', 'https://main--enchanting-syrniki-1c79ce.netlify.app');
         res.setHeader('Access-Control-Allow-Credentials',true);
         res.json({fn:acc[0].fname,ln:acc[0].lname});
        // console.log(id);
